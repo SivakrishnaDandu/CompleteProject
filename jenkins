@@ -1,10 +1,8 @@
-def BLUE_CONTAINER_NAME="blue-container"
-def GREEN_CONTAINER_NAME="green-container"
-def BLUE_CONTAINER_NAME_TAG="babu479/blue_demo_application"
-def GREEN_CONTAINER_NAME_TAG="babu479/green_demo_application"
-def CONTAINER_TAG="1.0.1"
-def DOCKER_HUB_USER="babu479"
-def HTTP_PORT="8080"
+def BLUE_CONTAINER_NAME="nginx"
+def BLUE_CONTAINER_NAME_TAG="sivakrishna1992/nginx"
+def CONTAINER_TAG="latest"
+def DOCKER_HUB_USER="sivakrishna1992"
+#def HTTP_PORT="8080"
 
 node('') {
 stage ('Initialize') {
@@ -12,15 +10,15 @@ stage ('Initialize') {
         env.PATH = "${mavenHome}/bin:${env.PATH}"
 }
 stage ('Clone') {
-dir("blue"){
-git branch: 'blue',
-credentialsId: 'ae6c9066a-410c-4462-b2ed-56004c6c20ab',
-url: 'https://github.com/babu479/Demo-Application.git'
+dir("Blue"){
+git branch: 'Blue',
+credentialsId: 'd7534a5a-2da5-4111-87de-8c795e5f6fcd',
+url: 'https://github.com/SivakrishnaDandu/Blue.git'
 }
 }
 stage ('Build') {
 sh """
-cd $WORKSPACE/blue
+cd $WORKSPACE/Blue
 mvn clean install"""
 }
 stage ("Image Prune") {
@@ -29,7 +27,7 @@ stage ("Image Prune") {
 stage('Image Build'){
         imageBuild(BLUE_CONTAINER_NAME,CONTAINER_TAG)
     }
-    stage('Push to Docker Registry'){
+stage('Push to Docker Registry'){
         withCredentials([usernamePassword(credentialsId: 'DockerHubAccount', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
             pushToImage(BLUE_CONTAINER_NAME, CONTAINER_TAG, USERNAME, PASSWORD)
         }
@@ -47,8 +45,8 @@ stage('Image Build'){
 }
 def imageBuild(blueContainerName,tag){
     sh """
-    cd $WORKSPACE/blue
-    cp $WORKSPACE/blue/target/*.war $WORKSPACE/blue
+    cd $WORKSPACE/Blue
+    cp $WORKSPACE/Blue/target/*.war $WORKSPACE/Blue
     docker build -t $blueContainerName:$tag  -t $blueContainerName --pull --no-cache ."""
 }
 
